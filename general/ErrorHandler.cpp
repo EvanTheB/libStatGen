@@ -16,7 +16,6 @@
  */
 
 #include "ErrorHandler.h"
-#include "PhoneHome.h"
 
 #include <stdexcept>
 #include <stdlib.h>
@@ -26,14 +25,14 @@ ErrorHandler::ErrorHandler()
 {
 }
 
-   
+
 // Destructor
 ErrorHandler::~ErrorHandler()
 {
 }
 
 
-void ErrorHandler::handleError(const char* message, 
+void ErrorHandler::handleError(const char* message,
                                HandlingType handlingType)
 {
     // Check the handling type.
@@ -44,16 +43,14 @@ void ErrorHandler::handleError(const char* message,
             break;
         case(ABORT):
             std::cerr << message << "\nExiting" << std::endl;
-            PhoneHome::completionStatus("ErrorHandler: Exiting due to Error"); 
             exit(-1);
             break;
         case(RETURN):
             return;
             break;
         default:
-            std::cerr << message << "\nUnknown Handle Type: Exiting" 
+            std::cerr << message << "\nUnknown Handle Type: Exiting"
                       << std::endl;
-            PhoneHome::completionStatus("Exiting, ErrorHandler::unknown handle type."); 
             exit(-1);
             break;
     }

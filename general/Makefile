@@ -20,7 +20,6 @@ ifeq ($(UNAME), Darwin)
   # -Wall contain -Wunused-variable and -Wunused-result from 'man gcc'
 endif
 
-#USER_COMPILE_VARS = -D_NO_PHONEHOME
 
 TOOLBASE=\
 	BaseAsciiMap \
@@ -65,7 +64,6 @@ TOOLBASE=\
 	PedigreeFamily \
 	PedigreeGlobals \
 	PedigreePerson \
-	PhoneHome \
 	QuickIndex \
 	Random \
 	ReferenceSequence \
@@ -84,7 +82,7 @@ TOOLBASE=\
 SRCONLY=\
 	PedigreeLoader.cpp \
 	PedigreeTrim.cpp \
-	PedigreeTwin.cpp 
+	PedigreeTwin.cpp
 
 HDRONLY= \
 	Constant.h \
@@ -108,7 +106,7 @@ include ../Makefiles/Makefile.lib
 
 
 CPP_TESTS := $(shell grep -l 'if defined(TEST)' *cpp)
-selftest: 
+selftest:
 	@for i in $(CPP_TESTS); do \
 		if [ "XXX$$i" = XXX ] ;\
 		then \

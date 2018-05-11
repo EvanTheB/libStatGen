@@ -19,7 +19,6 @@
 #include "Constant.h"
 #include "MathConstant.h"
 #include "Error.h"
-#include "PhoneHome.h"
 
 #include <stdio.h>
 #include <ctype.h>
@@ -38,7 +37,6 @@ Parameter::Parameter(char c, const char * desc, void * v)
     var = v;
     warnings = NULL;
 
-    myNoPhoneHome = true;
     myVersion.Clear();
 }
 
@@ -305,20 +303,13 @@ LongParameters::LongParameters(const char * desc, LongParameterList * lst)
             break;
         if(ptr->type == LP_PHONEHOME_VERSION)
         {
-            // Phone home is turned on, so add
-            // the parameter for the user to turn it off.
-            myNoPhoneHome = false;
-            myVersion = ptr->description;
-            ptr->description = "noPhoneHome";
-            ptr->value = &myNoPhoneHome;
-            ptr->type = LP_BOOL_PARAMETER;
-            index.Add(ptr->description, ptr);
+            exit(1);
         }
         else
         {
             if (ptr->value != NULL)
                 index.Add(ptr->description, ptr);
-            else 
+            else
                 group_len = max(strlen(ptr->description), group_len);
         }
         ptr++;
@@ -328,14 +319,7 @@ LongParameters::LongParameters(const char * desc, LongParameterList * lst)
     {
         if(ptr->type == LP_PHONEHOME_VERSION)
         {
-            // Phone home is turned on, so add
-            // the parameter for the user to turn it off.
-            myNoPhoneHome = false;
-            myVersion = ptr->description;
-            ptr->description = "noPhoneHome";
-            ptr->value = &myNoPhoneHome;
-            ptr->type = LP_BOOL_PARAMETER;
-            legacyIndex.Add(ptr->description, ptr);
+            exit(1);
         }
         else
         {
@@ -640,8 +624,6 @@ void ParameterList::Read(int argc, char ** argv, int start)
                   (const char *) warnings);
         warnings.Clear();
     }
-
-    HandlePhoneHome(argc, argv, start);
 }
 
 int ParameterList::ReadWithTrailer(int argc, char ** argv, int start)
@@ -692,8 +674,6 @@ int ParameterList::ReadWithTrailer(int argc, char ** argv, int start)
         warnings.Clear();
     }
 
-    HandlePhoneHome(argc, argv, start);
-
     return last_success;
 };
 
@@ -727,46 +707,7 @@ void ParameterList::MakeString(int argc, char ** argv, int start)
 }
 
 
-void ParameterList::HandlePhoneHome(int argc, char ** argv, int start)
-{
-    // Determine the tool name : args prior to start.
-    String programName = "";
-    for(int i = 0; i < start; i++)
-    {
-        if(i == 0)
-        {
-            programName = argv[i];
-        }
-        else
-        {
-            programName += ":";
-            programName += argv[i];
-        }
-    }
 
-    // Loop through and get the params
-    String params = "";
-    String version = "";
-
-    for (int i=0; i<count; i++)
-    {
-        pl[i]->addParamsToString(params);
-        // Check if phonehome is enabled.
-        if(!pl[i]->myVersion.IsEmpty() && (!pl[i]->myNoPhoneHome))
-        {
-            // Version specified & phoneHome enabled, so
-            // phonehome.
-            version = pl[i]->myVersion;
-        }
-    }
-    
-    if(!version.IsEmpty())
-    {
-        PhoneHome::checkVersion(programName.c_str(), 
-                                version.c_str(),
-                                params.c_str());
-    }
-}
 
 
 ParameterList::~ParameterList()
@@ -902,7 +843,7 @@ LongParamContainer::~LongParamContainer()
 }
 
 
-void LongParamContainer::add(const char * label, void * val, bool excl, 
+void LongParamContainer::add(const char * label, void * val, bool excl,
                              int paramType, bool touch)
 {
     if(myEndIndex+1 < MAX_PARAM_ARRAY_SIZE)
@@ -911,7 +852,7 @@ void LongParamContainer::add(const char * label, void * val, bool excl,
         myArray[myEndIndex].description = label;
         myArray[myEndIndex].value = val;
         myArray[myEndIndex].exclusive = excl;
-        myArray[myEndIndex].type = paramType; 
+        myArray[myEndIndex].type = paramType;
         myArray[myEndIndex].touched = touch;
         ++myEndIndex;
 
@@ -919,7 +860,7 @@ void LongParamContainer::add(const char * label, void * val, bool excl,
         myArray[myEndIndex].description = NULL;
         myArray[myEndIndex].value = NULL;
         myArray[myEndIndex].exclusive = false;
-        myArray[myEndIndex].type = 0; 
+        myArray[myEndIndex].type = 0;
         myArray[myEndIndex].touched = 0;
     }
     else
